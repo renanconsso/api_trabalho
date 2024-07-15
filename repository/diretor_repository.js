@@ -19,22 +19,20 @@ function cadastrarDiretor(diretor){
     return diretor;
 }
 
-function listarDiretores() {
+function listar() {
     return diretores;
 }
 
-function deletarDiretor(id) {
-    const diretorIndex = diretores.findIndex(diretor => diretor.id == id);
-    if (diretorIndex !== -1) {
-        diretores.splice(diretorIndex, 1);
-    }
+function deletar(id) {
+    const diretorDeletado = diretores.findIndex(diretor => diretor.id == id);
+    diretores.splice(diretorDeletado, 1);
     return diretores;
 }
 
 module.exports = {
     cadastrarDiretor,
     localizarDiretor,
-    listarDiretores,
-    deletarDiretor,
+    listar,
+    deletar,
     diretores
 };

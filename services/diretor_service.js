@@ -5,7 +5,7 @@ function listar() {
     let dados = diretorRepository.listar();
     if (dados) {
         return dados;
-    } else {
+    }else {
         throw new Error("Dados vazios.");
     }
 };
@@ -24,7 +24,7 @@ function cadastrarDiretorService(diretor) {
 function deletarDiretorService(idDeletado) {
     const diretorDeletado = diretorRepository.diretores.find(diretor => diretor.id == idDeletado);
     if (diretorDeletado) {
-        const diretorEncontrado = filmeRepository.filmes.some(filme => filme.diretor.includes(diretorDeletado.nome));
+        const diretorEncontrado = filmeRepository.filmes.some(filme => filme.diretores.includes(diretorDeletado.nome));
         if (diretorEncontrado) {
             throw new Error("O diretor não pode ser deletado, pois ele ainda possui filmes cadastrados em seu nome.");
         } else {

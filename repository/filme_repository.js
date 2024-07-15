@@ -7,7 +7,7 @@ const filmes = [
     {
         id: 0,
         nome: "A Insustentável Leveza de Ser",
-        diretores: ["Ivonei Marques", "Luis Henrique Ries"],
+        diretores: ["Ivonei Marques"],
         ano: 1972,
         disponivel: true
     },
@@ -28,7 +28,7 @@ function cadastrarFilme(filme){
 
 function retirarFilme(idUser, idFilme){
     const filme = filmes.find(f => f.id == idFilme);
-    const user = userRepository.usuarios.find(u => u.id == idUser);
+    const user = userRepository.usuarios.find(f => f.id == idUser);
     filme.disponivel = false;
     const dataEntrega = new Date();
     dataEntrega.setDate(dataEntrega.getDate() + 5);
@@ -39,7 +39,7 @@ function retirarFilme(idUser, idFilme){
 
 function devolverFilme(idUser, idFilme){
     const filme = filmes.find(f => f.id == idFilme);
-    const user = userRepository.usuarios.find(u => u.id == idUser);
+    const user = userRepository.usuarios.find(f => f.id == idUser);
     filme.disponivel = true;
     filme.dataEntrega = null;
     user.filmes = user.filmes.filter(f => f.id !== filme.id);
@@ -65,9 +65,7 @@ function deletar(id) {
 
 function atualizar(id, atributo, atualizacao) {
     const filmeSelecionado = filmes.find(filme => filme.id == id);
-    if (filmeSelecionado) {
-        filmeSelecionado[atributo] = atualizacao;
-    }
+    filmeSelecionado[atributo] = atualizacao;
     return filmes;
 }
 

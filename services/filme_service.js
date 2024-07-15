@@ -48,7 +48,7 @@ function deletarFilmeService(idDeletado) {
 
 function devolverFilmeService(userId, filmeId) {
     const filme = filmeRepository.filmes.find(f => f.id == filmeId);
-    const user = userRepository.usuarios.find(u => u.id == userId);
+    const user = userRepository.usuarios.find(f => f.id == userId);
     const filmeAlugado = user.filmes.find(f => f.id === filme.id);
 
     if (!filmeAlugado) {
@@ -69,7 +69,7 @@ function buscarFilmeService(atributo, condicao) {
     if (atributo === "diretor") {
         const listaRetornada = filmeRepository.filmes.filter(filme => filme.diretor.includes(condicao));
         return listaRetornada;
-    } else if (["id", "nome", "ano"].includes(atributo)) {
+    } else if (["id", "nome", "ano","diretores"].includes(atributo)) {
         return filmeRepository.buscar(atributo, condicao);
     } else {
         throw new Error("Atributo de busca inválido.");
@@ -77,8 +77,8 @@ function buscarFilmeService(atributo, condicao) {
 };
 
 function atualizarService(atributo, condicao, id) {
-    if (["nome", "ano"].includes(atributo)) {
-        const listaAtualizada = filmeRepository.atualizar(atributo, condicao);
+    if (["id","nome", "ano","diretores"].includes(atributo)) {
+        const listaAtualizada = filmeRepository.atualizar(id,atributo, condicao);
         if (listaAtualizada) {
             return listaAtualizada;
         } 
