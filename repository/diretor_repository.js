@@ -8,6 +8,7 @@ const diretores = [
     }
 ];
 
+//Funções...
 function localizarDiretor(inputDiretor){
     const diretor = diretores.find(d => d.nome.toLowerCase() === inputDiretor.toLowerCase());
     return diretor;

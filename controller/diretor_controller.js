@@ -1,4 +1,5 @@
-const services = require('../services/diretor_service');
+const services = require('../services/diretor_service'); // Import Services
+//Tratamento de erros
 
 function listar(req, res) {
     try {

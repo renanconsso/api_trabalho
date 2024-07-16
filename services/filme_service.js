@@ -1,6 +1,7 @@
-const filmeRepository = require('../repository/filme_repository');
-const userRepository = require('../repository/usuario_repository');
+const filmeRepository = require('../repository/filme_repository'); // Importando Repositorio do filme
+const usuarioRepository = require('../repository/usuario_repository'); // Importando Repositorio do Usuario
 
+//Validando dados de entrada
 function cadastrarFilmeService(filme) {
     const { id, nome, diretor, ano } = filme;
 
@@ -13,19 +14,19 @@ function cadastrarFilmeService(filme) {
     return filmeRepository.cadastrarFilme(filme);
 };
 
-function retirarFilmeService(userId, filmeId) {
+function retirarFilmeService(usuarioId, filmeId) {
     const filme = filmeRepository.filmes.find(f => f.id == filmeId);
-    const user = userRepository.usuarios.find(u => u.id == userId);
+    const usuario = usuarioRepository.usuarios.find(u => u.id == usuarioId);
     
     if (!filme || filme.disponivel != true) {
         throw new Error("O filme não está disponível para retirada.");
     }
 
-    if (!user || user.filmes.length >= 3) {
+    if (!usuario || usuario.filmes.length >= 3) {
         throw new Error("O usuário já possui o máximo de filmes permitidos em empréstimo.");
     }
 
-    return filmeRepository.retirarFilme(userId, filmeId);
+    return filmeRepository.retirarFilme(usuarioId, filmeId);
 };
 
 function listar() {
@@ -46,10 +47,10 @@ function deletarFilmeService(idDeletado) {
     }
 };
 
-function devolverFilmeService(userId, filmeId) {
+function devolverFilmeService(usuarioId, filmeId) {
     const filme = filmeRepository.filmes.find(f => f.id == filmeId);
-    const user = userRepository.usuarios.find(f => f.id == userId);
-    const filmeAlugado = user.filmes.find(f => f.id === filme.id);
+    const usuario = usuarioRepository.usuarios.find(f => f.id == usuarioId);
+    const filmeAlugado = usuario.filmes.find(f => f.id === filme.id);
 
     if (!filmeAlugado) {
         throw new Error("Este filme não está alugado para este usuário.");
@@ -62,7 +63,7 @@ function devolverFilmeService(userId, filmeId) {
         console.log(`Atenção: Você está devolvendo o filme com ${diferencaDias} dias de atraso.`);
     }
 
-    return filmeRepository.devolverFilme(userId, filmeId);
+    return filmeRepository.devolverFilme(usuarioId, filmeId);
 };
 
 function buscarFilmeService(atributo, condicao) {

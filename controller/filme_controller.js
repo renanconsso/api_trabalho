@@ -1,4 +1,5 @@
-const services = require('../services/filme_service');
+const services = require('../services/filme_service'); // Import Services
+//Tratamento de erros
 
 function listar(req, res) {
     res.json(services.listar());
@@ -16,10 +17,10 @@ function inserir(req, res) {
 };
 
 function retirarFilme(req, res) {
-    const { userId, filmeId } = req.body;
+    const { usuarioId, filmeId } = req.body;
 
     try {
-        const filmeRetirado = services.retirarFilmeService(userId, filmeId);
+        const filmeRetirado = services.retirarFilmeService(usuarioId, filmeId);
         res.status(200).json({ message: "Filme retirado com sucesso." });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -50,10 +51,10 @@ function atualizarFilme(req, res) {
 
 
 function devolverFilme(req, res) {
-    const { userId, filmeId } = req.body;
+    const { usuarioId, filmeId } = req.body;
 
     try {
-        services.devolverFilmeService(userId, filmeId);
+        services.devolverFilmeService(usuarioId, filmeId);
         res.status(201).json({ message: "O filme foi retornado." });
     } catch (err) {
         res.status(400).json({ error: err.message });

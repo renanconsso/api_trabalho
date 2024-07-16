@@ -1,6 +1,7 @@
-const diretorRepository = require('../repository/diretor_repository');
-const filmeRepository = require('../repository/filme_repository');
+const diretorRepository = require('../repository/diretor_repository'); // Importando repositorio do diretor
+const filmeRepository = require('../repository/filme_repository'); // Importando repositorio do Filme
 
+//Validando dados de entrada
 function listar() {
     let dados = diretorRepository.listar();
     if (dados) {

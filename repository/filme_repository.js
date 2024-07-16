@@ -1,24 +1,26 @@
 const diretorRepository = require('../repository/diretor_repository');
-const userRepository = require('../repository/usuario_repository');
+const usuarioRepository = require('../repository/usuario_repository');
 
 let idGeradorFilmes = 3;
 
 const filmes = [
     {
         id: 0,
-        nome: "A Insustentável Leveza de Ser",
-        diretores: ["Ivonei Marques"],
-        ano: 1972,
+        nome: "007 GoldenEye",
+        diretores: ["Martin Campbell"],
+        ano: 1995,
         disponivel: true
     },
     {
         id: 1,
-        nome: "Histórias de Mãozinha",
-        diretores: ["Mãozinha"],
-        ano: 2024,
+        nome: "60 segundos",
+        diretores: ["Dominic Sena"],
+        ano: 2000,
         disponivel: true
     }
 ];
+
+//Funções...
 
 function cadastrarFilme(filme){
     filme.id = ++idGeradorFilmes;
@@ -26,24 +28,24 @@ function cadastrarFilme(filme){
     return filme;
 }
 
-function retirarFilme(idUser, idFilme){
+function retirarFilme(idUsuario, idFilme){
     const filme = filmes.find(f => f.id == idFilme);
-    const user = userRepository.usuarios.find(f => f.id == idUser);
+    const usuario = usuarioRepository.usuarios.find(f => f.id == idUsuario);
     filme.disponivel = false;
     const dataEntrega = new Date();
     dataEntrega.setDate(dataEntrega.getDate() + 5);
     filme.dataEntrega = dataEntrega;
-    user.filmes.push(filme);
-    return user;
+    usuario.filmes.push(filme);
+    return usuario;
 }
 
-function devolverFilme(idUser, idFilme){
+function devolverFilme(idUsuario, idFilme){
     const filme = filmes.find(f => f.id == idFilme);
-    const user = userRepository.usuarios.find(f => f.id == idUser);
+    const usuario = usuarioRepository.usuarios.find(f => f.id == idUsuario);
     filme.disponivel = true;
     filme.dataEntrega = null;
-    user.filmes = user.filmes.filter(f => f.id !== filme.id);
-    return user;
+    usuario.filmes = usuario.filmes.filter(f => f.id !== filme.id);
+    return usuario;
 }
 
 function buscar(atributo, condicao){

@@ -1,4 +1,5 @@
-const services = require('../services/usuario_service');
+const services = require('../services/usuario_service'); // Import Services
+//Tratamento de erros
 
 function listar(req, res) {
     res.json(services.listar());

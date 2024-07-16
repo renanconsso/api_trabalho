@@ -2,14 +2,17 @@ let idGeradorUsuarios = 3;
 
 const usuarios = [
     {
-        id: 1,
         nome: "breno",
-        senha: "maozinha",
+        senha: "inter",
         matricula: 1,
         telefone: 51991694290,
-        filmes: []
+        filmes: [],
+        id: 1
     }
 ];
+
+//Funções...
+
 
 function buscar(atributo, condicao){
     const listaRetornada = usuarios.filter(usuario => usuario[atributo] == condicao);
@@ -20,7 +23,6 @@ function localizarUsuario(inputUsuario){
     const usuario = usuarios.find(u => u.nome.toLowerCase() === inputUsuario.toLowerCase());
     return usuario;
 }
-
 function validarSenha(inputSenha, usuario){
     if(usuario.senha === inputSenha){
         return true;
