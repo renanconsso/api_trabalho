@@ -1,39 +1,25 @@
-let idGeradorDiretores = 3;
+// diretor_repository.js
+const pool = require('../db');
 
-const diretores = [
-    {
-        id: 1,
-        nome: "herbert richers",
-        nacionalidade: "catalão"
-    }
-];
-
-//Funções...
-function localizarDiretor(inputDiretor){
-    const diretor = diretores.find(d => d.nome.toLowerCase() === inputDiretor.toLowerCase());
-    return diretor;
+async function listar() {
+    const res = await pool.query('SELECT * FROM diretores');
+    return res.rows;
 }
 
-function cadastrarDiretor(diretor){
-    diretor.id = ++idGeradorDiretores;
-    diretores.push(diretor);
-    return diretor;
+async function cadastrarDiretor(diretor) {
+    const res = await pool.query(
+        'INSERT INTO diretores (nome, nacionalidade) VALUES ($1, $2) RETURNING *',
+        [diretor.nome, diretor.nacionalidade]
+    );
+    return res.rows[0];
 }
 
-function listar() {
-    return diretores;
-}
-
-function deletar(id) {
-    const diretorDeletado = diretores.findIndex(diretor => diretor.id == id);
-    diretores.splice(diretorDeletado, 1);
-    return diretores;
+async function deletar(id) {
+    await pool.query('DELETE FROM diretores WHERE id = $1', [id]);
 }
 
 module.exports = {
-    cadastrarDiretor,
-    localizarDiretor,
     listar,
-    deletar,
-    diretores
+    cadastrarDiretor,
+    deletar
 };

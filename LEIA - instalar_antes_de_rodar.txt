@@ -1,0 +1,4 @@
+npm install express
+npm install pg
+npm install jsonwebtoken
+npm install bcrypt

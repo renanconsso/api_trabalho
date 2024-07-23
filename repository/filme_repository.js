@@ -1,83 +1,87 @@
-const diretorRepository = require('../repository/diretor_repository');
-const usuarioRepository = require('../repository/usuario_repository');
+const db = require('../db');
 
-let idGeradorFilmes = 3;
+async function listar() {
+    const res = await db.query('SELECT * FROM filmes');
+    return res.rows;
+}
 
-const filmes = [
-    {
-        id: 0,
-        nome: "007 GoldenEye",
-        diretores: ["Martin Campbell"],
-        ano: 1995,
-        disponivel: true
-    },
-    {
-        id: 1,
-        nome: "60 segundos",
-        diretores: ["Dominic Sena"],
-        ano: 2000,
-        disponivel: true
+async function cadastrar(filme) {
+    const { nome, ano, diretores } = filme;
+
+    // Verificar se todos os diretores existem
+    for (const diretor of diretores) {
+        const res = await db.query('SELECT * FROM diretores WHERE id = $1', [diretor]);
+        if (res.rows.length === 0) {
+            throw new Error(`Diretor com ID ${diretor} não encontrado.`);
+        }
     }
-];
 
-//Funções...
-
-function cadastrarFilme(filme){
-    filme.id = ++idGeradorFilmes;
-    filmes.push(filme);
-    return filme;
+    const res = await db.query(
+        'INSERT INTO filmes (nome, ano, diretores, disponivel, dataentrega) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [nome, ano, diretores, true, null]
+    );
+    return res.rows[0];
 }
 
-function retirarFilme(idUsuario, idFilme){
-    const filme = filmes.find(f => f.id == idFilme);
-    const usuario = usuarioRepository.usuarios.find(f => f.id == idUsuario);
-    filme.disponivel = false;
-    const dataEntrega = new Date();
-    dataEntrega.setDate(dataEntrega.getDate() + 5);
-    filme.dataEntrega = dataEntrega;
-    usuario.filmes.push(filme);
-    return usuario;
-}
-
-function devolverFilme(idUsuario, idFilme){
-    const filme = filmes.find(f => f.id == idFilme);
-    const usuario = usuarioRepository.usuarios.find(f => f.id == idUsuario);
-    filme.disponivel = true;
-    filme.dataEntrega = null;
-    usuario.filmes = usuario.filmes.filter(f => f.id !== filme.id);
-    return usuario;
-}
-
-function buscar(atributo, condicao){
-    const listaRetornada = filmes.filter(filme => filme[atributo] == condicao);
-    return listaRetornada;
-}
-
-function listar() {
-    return filmes;
-}
-
-function deletar(id) {
-    const filmeDeletado = filmes.findIndex(filme => filme.id == id);
-    if (filmeDeletado !== -1) {
-        filmes.splice(filmeDeletado, 1);
+async function retirar(idUsuario, idFilme) {
+    if (!idUsuario || !idFilme) {
+        throw new Error("ID do usuário e ID do filme são necessários.");
     }
-    return filmes;
+    await db.query(
+        'INSERT INTO retiradas (id_usuario, id_filme) VALUES ($1, $2)',
+        [idUsuario, idFilme]
+    );
 }
 
-function atualizar(id, atributo, atualizacao) {
-    const filmeSelecionado = filmes.find(filme => filme.id == id);
-    filmeSelecionado[atributo] = atualizacao;
-    return filmes;
+async function devolver(idUsuario, idFilme) {
+    if (!idUsuario || !idFilme) {
+        throw new Error("ID do usuário e ID do filme são necessários.");
+    }
+    await db.query(
+        'DELETE FROM retiradas WHERE id_usuario = $1 AND id_filme = $2',
+        [idUsuario, idFilme]
+    );
+}
+
+async function buscarRetiradas(idUsuario) {
+    const res = await db.query(
+        'SELECT * FROM retiradas WHERE id_usuario = $1',
+        [idUsuario]
+    );
+    return res.rows;
+}
+
+async function buscarRetirada(idUsuario, idFilme) {
+    const res = await db.query(
+        'SELECT * FROM retiradas WHERE id_usuario = $1 AND id_filme = $2',
+        [idUsuario, idFilme]
+    );
+    return res.rows;
+}
+
+
+async function buscar(atributo, condicao) {
+    const res = await db.query(`SELECT * FROM filmes WHERE ${atributo} = $1`, [condicao]);
+    return res.rows;
+}
+
+async function deletar(id) {
+    await db.query('DELETE FROM filmes WHERE id = $1', [id]);
+}
+
+async function atualizar(id, atributo, atualizacao) {
+    const res = await db.query(`UPDATE filmes SET ${atributo} = $1 WHERE id = $2 RETURNING *`, [atualizacao, id]);
+    return res.rows[0];
 }
 
 module.exports = {
-    buscar,
-    devolverFilme,
-    retirarFilme,
-    cadastrarFilme,
-    filmes,
     listar,
+    cadastrar,
+    retirar,
+    devolver,
+    buscar,
     deletar,
-    atualizar
+    atualizar,
+    buscarRetirada,
+    buscarRetiradas
 };

@@ -1,71 +1,86 @@
-const services = require('../services/filme_service'); // Import Services
-//Tratamento de erros
+const services = require('../services/filme_service');
 
-function listar(req, res) {
-    res.json(services.listar());
+async function listar(req, res) {
+    try {
+        const dados = await services.listar();
+        res.json(dados);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+async function cadastrarFilme(req, res) {
+    let filme = req.body;
+
+    try {
+        await services.cadastrar(filme);
+        res.status(201).json({ message: "Filme cadastrado com sucesso!" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+async function retirarFilme(req, res) {
+    const { idUsuario, idFilme } = req.body;
+
+    try {
+        await services.retirar(idUsuario, idFilme);
+        res.status(200).json({ message: "Filme retirado com sucesso!" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 }
 
-function inserir(req, res) {
-    let filme = req.body;
-    
-    try {
-        const filmeInserido = services.cadastrarFilmeService(filme);
-        res.status(201).json({ message: "Filme inserido com sucesso na plataforma." });
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }    
-};
-
-function retirarFilme(req, res) {
-    const { usuarioId, filmeId } = req.body;
+async function devolverFilme(req, res) {
+    const { idUsuario, idFilme } = req.body;
 
     try {
-        const filmeRetirado = services.retirarFilmeService(usuarioId, filmeId);
-        res.status(200).json({ message: "Filme retirado com sucesso." });
+        await services.devolver(idUsuario, idFilme);
+        res.status(200).json({ message: "Filme devolvido com sucesso!" });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ error: error.message });
+    }
+}
+async function buscarFilme(req, res) {
+    const { atributo, condicao } = req.query;
+
+    try {
+        const filmes = await services.buscar(atributo, condicao);
+        res.json(filmes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };
 
-function deletarPorId(req, res) {
-    const id = req.params.id
+async function deletarFilme(req, res) {
+    let id = req.params.id;
+
     try {
-        services.deletarFilmeService(id);
-        res.json("Filme excluído.");
-    } catch (err) {
-        res.status(400).json({ error: err.message });
+        await services.deletar(id);
+        res.status(201).json({ message: "Filme deletado com sucesso." });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };
 
-function atualizarFilme(req, res) {
-    const id = req.params.id;
-    const { atributo, condicao } = req.body;
+async function atualizar(req, res) {
+    const { id } = req.params;
+    const { atributo, atualizacao } = req.body;
 
     try {
-        const filmeAtualizado = services.atualizarService(atributo, condicao, id);
-        res.json({ message: "Filme atualizado!", filme: filmeAtualizado });
-    } catch(err) {
-        res.status(400).json({ error: err.message });
-    }
-};
-
-
-function devolverFilme(req, res) {
-    const { usuarioId, filmeId } = req.body;
-
-    try {
-        services.devolverFilmeService(usuarioId, filmeId);
-        res.status(201).json({ message: "O filme foi retornado." });
-    } catch (err) {
-        res.status(400).json({ error: err.message });
+        const filmeAtualizado = await services.atualizar(id, atributo, atualizacao);
+        res.json(filmeAtualizado);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };
 
 module.exports = {
     listar,
-    inserir,
-    deletarPorId,
-    atualizarFilme,
+    cadastrarFilme,
     retirarFilme,
-    devolverFilme
+    devolverFilme,
+    buscarFilme,
+    deletarFilme,
+    atualizar
 };

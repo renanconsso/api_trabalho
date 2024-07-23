@@ -1,33 +1,26 @@
-const services = require('../services/usuario_service'); // Import Services
-//Tratamento de erros
+const services = require('../services/usuario_service');
 
-function listar(req, res) {
-    res.json(services.listar());
+async function listar(req, res) {
+    try {
+        const dados = await services.listar();
+        res.json(dados);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 }
 
-function inserir(req, res) {
+async function cadastrarUsuario(req, res) {
     let usuario = req.body;
-    
-    try {
-        const usuarioInserido = services.cadastrarUsuarioService(usuario);
-        res.status(201).json(usuarioInserido);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }    
-}
 
-function buscarPorId(req, res) {
-    const id = +req.params.id;    
     try {
-        const usuarioComId = services.buscarUsuarioService(id);
-        res.json(usuarioComId);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }        
+        await services.cadastrar(usuario);
+        res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 }
 
 module.exports = {
     listar,
-    inserir,
-    buscarPorId
+    cadastrarUsuario
 };

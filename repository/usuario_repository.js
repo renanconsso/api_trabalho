@@ -1,50 +1,31 @@
-let idGeradorUsuarios = 3;
+const db = require('../db');
+const { buscar } = require('./filme_repository');
 
-const usuarios = [
-    {
-        nome: "breno",
-        senha: "inter",
-        matricula: 1,
-        telefone: 51991694290,
-        filmes: [],
-        id: 1
-    }
-];
-
-//Funções...
-
-
-function buscar(atributo, condicao){
-    const listaRetornada = usuarios.filter(usuario => usuario[atributo] == condicao);
-    return listaRetornada;
+async function listar() {
+    const res = await db.query('SELECT * FROM usuarios');
+    return res.rows;
 }
 
-function localizarUsuario(inputUsuario){
-    const usuario = usuarios.find(u => u.nome.toLowerCase() === inputUsuario.toLowerCase());
-    return usuario;
-}
-function validarSenha(inputSenha, usuario){
-    if(usuario.senha === inputSenha){
-        return true;
-    }
-    return false;
+async function cadastrar(usuario) {
+    const { nome, matricula, telefone } = usuario;
+    const res = await db.query(
+        'INSERT INTO usuarios (nome, matricula, telefone) VALUES ($1, $2, $3) RETURNING *',
+        [nome, matricula, telefone]
+    );
+    return res.rows[0];
 }
 
-function cadastrarUsuario(usuario){
-    usuario.id = ++idGeradorUsuarios;
-    usuarios.push(usuario);
-    return usuario;
+async function buscarFilmes(idUsuario) {
+    const res = await db.query(
+        'SELECT f.id, f.nome FROM filmes f ' +
+        'JOIN retiradas r ON f.id = r.id_filme ' +
+        'WHERE r.id_usuario = $1',
+        [idUsuario]
+    );
+    return res.rows;
 }
-
-function listar() {
-    return usuarios;
-}
-
 module.exports = {
-    cadastrarUsuario,
-    localizarUsuario,
-    validarSenha,
-    usuarios,
     listar,
-    buscar
+    cadastrar,
+    buscarFilmes
 };

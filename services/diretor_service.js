@@ -1,44 +1,56 @@
-const diretorRepository = require('../repository/diretor_repository'); // Importando repositorio do diretor
-const filmeRepository = require('../repository/filme_repository'); // Importando repositorio do Filme
+// diretor_service.js
+const diretorRepository = require('../repository/diretor_repository');
+const filmeRepository = require('../repository/filme_repository');
 
-//Validando dados de entrada
-function listar() {
-    let dados = diretorRepository.listar();
-    if (dados) {
+async function listar() {
+    let dados = await diretorRepository.listar();
+    if (dados.length > 0) {
         return dados;
-    }else {
+    } else {
         throw new Error("Dados vazios.");
     }
-};
+}
 
-function cadastrarDiretorService(diretor) {
+async function cadastrarDiretorService(diretor) {
     const { nome, nacionalidade } = diretor;
 
     if (!nome || !nacionalidade) {
         throw new Error("Os campos nome e nacionalidade são obrigatórios.");
     }
 
-    console.log("Diretor cadastrado com sucesso.")
-    return diretorRepository.cadastrarDiretor(diretor);
-};
+    return await diretorRepository.cadastrarDiretor(diretor);
+}
 
-function deletarDiretorService(idDeletado) {
-    const diretorDeletado = diretorRepository.diretores.find(diretor => diretor.id == idDeletado);
-    if (diretorDeletado) {
-        const diretorEncontrado = filmeRepository.filmes.some(filme => filme.diretores.includes(diretorDeletado.nome));
-        if (diretorEncontrado) {
-            throw new Error("O diretor não pode ser deletado, pois ele ainda possui filmes cadastrados em seu nome.");
+
+async function deletarDiretorService(idDeletado) {
+    try {
+        const diretores = await diretorRepository.listar();
+        console.log('Diretores:', diretores); // Verifique o conteúdo
+        const diretorDeletado = diretores.find(diretor => diretor.id == idDeletado);
+        if (diretorDeletado) {
+            const filmes = await filmeRepository.listar();
+            console.log('Filmes:', filmes); // Verifique o conteúdo
+            
+            const diretorEncontrado = filmes.some(filme => filme.diretores.includes(diretorDeletado.nome));
+            
+            if (diretorEncontrado) {
+                throw new Error("O diretor não pode ser deletado, pois ele ainda possui filmes cadastrados em seu nome.");
+            } else {
+                await diretorRepository.deletar(idDeletado);
+                return;
+            }
         } else {
-            diretorRepository.deletar(idDeletado);
-            return;
+            throw new Error("ID fornecido não foi localizado.");
         }
-    } else {
-        throw new Error("ID fornecido não foi localizado.");
+    } catch (error) {
+        console.error(error.message);
+        throw error;
     }
-};
+}
 
-module.exports = { 
-    deletarDiretorService,
+
+module.exports = {
+    listar,
     cadastrarDiretorService,
-    listar
+    deletarDiretorService
 };
